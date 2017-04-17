@@ -1,0 +1,117 @@
+% Copyright (c) 2017 Joost van Zwieten
+%
+% Permission is hereby granted, free of charge, to any person obtaining a copy
+% of this software and associated documentation files (the "Software"), to deal
+% in the Software without restriction, including without limitation the rights
+% to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+% copies of the Software, and to permit persons to whom the Software is
+% furnished to do so, subject to the following conditions:
+%
+% The above copyright notice and this permission notice shall be included in
+% all copies or substantial portions of the Software.
+%
+% THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+% IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+% FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+% AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+% LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+% OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+% THE SOFTWARE.
+%
+\NeedsTeXFormat{LaTeX2e}[1994/06/01]
+\ProvidesPackage{diamtrcov}[2017/04/17 DIAM Technical Report Cover]
+
+\RequirePackage{kvoptions}
+\RequirePackage{geometry}
+
+\DeclareStringOption{number}
+\DeclareStringOption{year}
+\DeclareBoolOption[true]{auto}
+\DeclareComplementaryOption{noauto}{auto}
+\ProcessLocalKeyvalOptions*
+
+\ifx\diamtrcov@number\@empty
+  \PackageError{diamtrcov}
+    {Missing mandatory package option 'number'}
+    {Example usage: \noexpand\usepackage[year=2017,number=17-01]{diamtrcov}}
+\fi
+
+\ifx\diamtrcov@year\@empty
+  \PackageError{diamtrcov}%
+    {Missing mandatory package option 'year'}%
+    {Example usage: \noexpand\usepackage[year=2017,number=17-01]{diamtrcov}}%
+\fi
+
+\def\diamtrcov@title{\@title}
+\def\diamtrcov@author{\@author}
+
+\newcommand{\diamtrcovtitle}[1]{\gdef\diamtrcov@title{#1}}
+\newcommand{\diamtrcovauthor}[1]{\gdef\diamtrcov@author{#1}}
+
+\def\diamtrcov@gobbleopt{\@ifnextchar[\diamtrcov@gobbleopt@a\@gobble}
+\def\diamtrcov@gobbleopt@a[#1]{\@gobble}
+
+\def\makediamtrcov{%
+  \eject%
+  % Change margins.
+  \newgeometry{margin=1in}%
+  % Setup font and skips.
+  \begingroup%
+  \renewcommand{\rmdefault}{lmr}%
+  \renewcommand{\ttdefault}{lmtt}%
+  \renewcommand{\scdefault}{sc}%
+  \renewcommand{\seriesdefault}{m}%
+  \renewcommand{\shapedefault}{n}%
+  \renewcommand{\familydefault}{\rmdefault}%
+  \parindent=0pt%
+  \parskip=0pt%
+  \fontsize{12}{14.5}\selectfont%
+  \normalfont%
+  % Let thanks, footnote, footnotemark gobble.
+  \let\thanks\@gobble%
+  \let\footnotemark\diamtrcov@gobbleopt%
+  \let\footnotetext\diamtrcov@gobbleopt%
+  % Write title page.
+  \thispagestyle{empty}%
+  \null\vspace{2ex}%
+  \begin{center}%
+    \sc\fontsize{14}{18}\selectfont%
+    {\fontsize{17}{22}\selectfont DELFT UNIVERSITY OF TECHNOLOGY}%
+    \par\vspace{3cm}%
+    REPORT \diamtrcov@number%
+    \par\vspace{4ex}%
+    \diamtrcov@title%
+    \par\vspace{4ex}%
+    \diamtrcov@author%
+  \end{center}%
+  \vfill%
+  \begin{center}%
+    \tt%
+    ISSN 1389-6520
+    \par\vspace{2ex}%
+    Reports of the Delft Institute of Applied Mathematics
+    \par\vspace{2ex}%
+    Delft \diamtrcov@year
+  \end{center}%
+  \vspace{1cm}%
+  \eject%
+  % Write copyright page.
+  \thispagestyle{empty}%
+  \null\vfill%
+  Copyright \copyright{} \diamtrcov@year{} by Delft Institute of Applied
+  Mathematics, Delft, The Netherlands.
+  \par\vspace{2ex}%
+  No part of the Journal may be reproduced, stored in a retrieval system, or
+  transmitted, in any form or by any means, electronic, mechanical,
+  photocopying, recording, or otherwise, without the prior written
+  permission from Delft Institute of Applied Mathematics, Delft University
+  of Technology, The Netherlands.
+  \eject%
+  % Restore font, skips, margins, footnotes.
+  \endgroup%
+  \restoregeometry%
+}
+
+\ifdiamtrcov@auto\AtBeginDocument{\makediamtrcov}\fi
+
+% vim: sts=2:sw=2:et
